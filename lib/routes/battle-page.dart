@@ -1,6 +1,8 @@
 import 'package:chessroad/board/board-widget.dart';
 import 'package:chessroad/chess/chess-base.dart';
+import 'package:chessroad/common/color-constants.dart';
 import 'package:chessroad/game/battle.dart';
+import 'package:chessroad/main.dart';
 import 'package:flutter/material.dart';
 
 class BattlePage extends StatefulWidget {
@@ -16,6 +18,104 @@ class _BattlePageState extends State<BattlePage> {
   void initState() {
     super.initState();
     Battle.shared.init();
+  }
+
+  Widget createPageHeader() {
+    final titleStyle =
+        TextStyle(fontSize: 28, color: ColorConstants.DarkTextPrimary);
+    final subTitleStyle =
+        TextStyle(fontSize: 16, color: ColorConstants.DarkTextSecondary);
+
+    return Container(
+      margin: EdgeInsets.only(top: ChessRoadApp.StatusBarHeight),
+      child: Column(
+        children: [
+          Row(children: [
+            IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: ColorConstants.DarkTextPrimary,
+              ),
+              onPressed: () {},
+            ),
+            Expanded(child: SizedBox()),
+            Text(
+              '单机对战',
+              style: titleStyle,
+            ),
+            Expanded(child: SizedBox()),
+            IconButton(
+              icon: Icon(Icons.settings, color: ColorConstants.DarkTextPrimary),
+              onPressed: () {},
+            ),
+          ]),
+          Container(
+            height: 4,
+            width: 180,
+            margin: EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: ColorConstants.BoardBackground,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text('[游戏状态]', maxLines: 1, style: subTitleStyle),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget createBoard() {
+    final windowSize = MediaQuery.of(context).size;
+
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: BattlePage.BoardMarginHorizontal,
+        vertical: BattlePage.BoardMarginVertical,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        color: ColorConstants.BoardBackground,
+      ),
+      child: BoardWidget(
+        width: windowSize.width - BattlePage.BoardMarginHorizontal * 2,
+        onBoardTap: onBoardTap,
+      ),
+    );
+  }
+
+  Widget createOperatorBar() {
+    final buttonStyle = TextStyle(color: ColorConstants.Primary, fontSize: 20);
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        color: ColorConstants.BoardBackground,
+      ),
+      margin:
+          EdgeInsets.symmetric(horizontal: BattlePage.BoardMarginHorizontal),
+      padding: EdgeInsets.symmetric(vertical: 2),
+      child: Row(children: [
+        Expanded(child: SizedBox()),
+        FlatButton(
+          child: Text('新对局', style: buttonStyle),
+          onPressed: () {},
+        ),
+        Expanded(child: SizedBox()),
+        FlatButton(
+          child: Text('悔棋', style: buttonStyle),
+          onPressed: () {},
+        ),
+        Expanded(child: SizedBox()),
+        FlatButton(
+          child: Text('分析局面', style: buttonStyle),
+          onPressed: () {},
+        ),
+        Expanded(child: SizedBox()),
+      ]),
+    );
   }
 
   onBoardTap(BuildContext context, int position) {
@@ -41,18 +141,17 @@ class _BattlePageState extends State<BattlePage> {
 
   @override
   Widget build(BuildContext context) {
-    final windowSize = MediaQuery.of(context).size;
-    final boardHeight = windowSize.width - BattlePage.BoardMarginHorizontal * 2;
+    final header = createPageHeader();
+    final board = createBoard();
+    final operatorBar = createOperatorBar();
 
     return Scaffold(
-      appBar: AppBar(title: Text('Battle')),
-      body: Container(
-        margin: const EdgeInsets.symmetric(
-          horizontal: BattlePage.BoardMarginHorizontal,
-          vertical: BattlePage.BoardMarginVertical,
-        ),
-        child: BoardWidget(width: boardHeight, onBoardTap: onBoardTap),
-      ),
+      backgroundColor: ColorConstants.DarkBackground,
+      body: Column(children: [
+        header,
+        board,
+        operatorBar,
+      ]),
     );
   }
 }

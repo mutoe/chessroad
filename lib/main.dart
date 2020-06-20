@@ -1,4 +1,5 @@
 import 'package:chessroad/routes/battle-page.dart';
+import 'package:chessroad/routes/main-menu.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -6,12 +7,17 @@ void main() {
 }
 
 class ChessRoadApp extends StatelessWidget {
+  static const StatusBarHeight = 28.0;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.brown),
+      theme: ThemeData(
+        primarySwatch: Colors.brown,
+        fontFamily: 'QiTi',
+      ),
       debugShowCheckedModeBanner: false,
-      home: BattlePage(),
+      home: MainMenu(),
     );
   }
 }
