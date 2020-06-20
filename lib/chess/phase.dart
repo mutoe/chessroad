@@ -5,11 +5,26 @@ class Phase {
 
   List<String> _pieces;
 
-  get side => _side;
+  String get side => _side;
 
   turnSide() => _side = Side.exchange(_side);
 
   String pieceAt(int index) => _pieces[index];
+
+  bool move(int from, int to) {
+    if (!validateMove(from, to)) return false;
+
+    _pieces[to] = _pieces[from];
+    _pieces[from] = Piece.Empty;
+
+    _side = Side.exchange(_side);
+
+    return true;
+  }
+
+  bool validateMove(int from, int to) {
+    return true;
+  }
 
   Phase.defaultPhase() {
     _side = Side.Red;

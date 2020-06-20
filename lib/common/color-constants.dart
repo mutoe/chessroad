@@ -18,7 +18,7 @@ class ColorConstants {
   static const DarkTextSecondary = Color(0x99ffffff);
 
   static const FocusPosition = Color(0x99ffffff);
-  static const BlurPosition = Color(0x99ffffff);
+  static const BlurPosition = Color(0x09ffffff);
 
   static const BlackPieceColor = Color(0xff000000);
   static const BlackPieceBorderColor = Color(0xff222222);

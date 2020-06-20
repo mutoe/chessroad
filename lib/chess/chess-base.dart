@@ -4,6 +4,7 @@ class Side {
   static const Black = 'b';
 
   static String of(String piece) {
+    if (piece == '') return Unknown;
     // 'RNBAKCP' means that '车马象仕将炮兵', lowercase means Black
     if ('RNBAKCP'.contains(piece)) return Red;
     if ('rnbakcp'.contains(piece)) return Black;
