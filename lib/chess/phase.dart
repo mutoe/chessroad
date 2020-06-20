@@ -1,3 +1,5 @@
+import 'package:chessroad/chess/steps-validate.dart';
+
 import 'chess-base.dart';
 
 class Phase {
@@ -34,7 +36,8 @@ class Phase {
   }
 
   bool validateMove(int from, int to) {
-    return true;
+    if (Side.of(_pieces[from]) != _side) return false;
+    return StepValidate.validate(this, Move(from, to));
   }
 
   String toFen() {
@@ -108,5 +111,19 @@ class Phase {
     for (var i = 0; i < 90; i++) {
       _pieces[i] ??= Piece.Empty;
     }
+  }
+
+  Phase.clone(Phase other) {
+    _pieces = List<String>();
+    other._pieces.forEach((piece) => _pieces.add(piece));
+    _side = other._side;
+    halfMove = other.halfMove;
+    fullMove = other.fullMove;
+  }
+
+  void moveTest(Move move, {turnSide = false}) {
+    _pieces[move.to] = _pieces[move.from];
+    _pieces[move.from] = Piece.Empty;
+    if (turnSide) _side = Side.exchange(_side);
   }
 }
