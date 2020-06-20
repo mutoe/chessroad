@@ -3,21 +3,96 @@ import 'package:chessroad/main.dart';
 import 'package:chessroad/routes/battle-page.dart';
 import 'package:flutter/material.dart';
 
-class MainMenu extends StatelessWidget {
+class MainMenu extends StatefulWidget {
+  @override
+  _MainMenuState createState() => _MainMenuState();
+}
+
+class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
+  AnimationController inController, shadowController;
+  Animation inAnimation, shadowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // title scale animation
+    inController = AnimationController(
+      duration: Duration(milliseconds: 600),
+      vsync: this,
+    );
+    inAnimation = CurvedAnimation(parent: inController, curve: Curves.bounceIn);
+    inAnimation = Tween(begin: 1.6, end: 1.0).animate(inController);
+
+    // shadow depth animation
+    shadowController = AnimationController(
+      duration: Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    shadowAnimation = Tween(begin: 0.0, end: 12.0).animate(shadowController);
+
+    inController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) shadowController.forward();
+    });
+
+    shadowController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) shadowController.reverse();
+    });
+
+    inAnimation.addListener(() {
+      try {
+        setState(() {});
+      } catch (e) {}
+    });
+    shadowAnimation.addListener(() {
+      try {
+        setState(() {});
+      } catch (e) {}
+    });
+    inController.forward();
+  }
+
+  @override
+  void dispose() {
+    inController.dispose();
+    shadowController.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final nameStyle = TextStyle(
       fontSize: 64,
       color: Colors.black,
+      shadows: [
+        Shadow(
+          color: Color(0x99660000),
+          offset: Offset(0, shadowAnimation.value / 2),
+          blurRadius: shadowAnimation.value,
+        )
+      ],
     );
-    final menuItemStyle =
-        TextStyle(fontSize: 28, color: ColorConstants.Primary);
+    final menuItemStyle = TextStyle(
+      fontSize: 28,
+      color: ColorConstants.Primary,
+      shadows: [
+        Shadow(
+          color: Color(0x7f000000),
+          offset: Offset(0, shadowAnimation.value / 6),
+          blurRadius: shadowAnimation.value / 3,
+        )
+      ],
+    );
 
     final menuItems = Center(
       child: Column(
         children: [
           Expanded(child: SizedBox(), flex: 4),
-          Text('中国象棋', style: nameStyle, textAlign: TextAlign.center),
+          Transform.scale(
+            scale: inAnimation.value,
+            child: Text('中国象棋', style: nameStyle, textAlign: TextAlign.center),
+          ),
           Expanded(child: SizedBox()),
           FlatButton(
             child: Text('单机对战', style: menuItemStyle),
@@ -26,11 +101,7 @@ class MainMenu extends StatelessWidget {
           Expanded(child: SizedBox()),
           FlatButton(
             child: Text('挑战云主机', style: menuItemStyle),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => BattlePage()),
-              );
-            },
+            onPressed: () => navigateTo(BattlePage()),
           ),
           Expanded(child: SizedBox()),
           FlatButton(
@@ -62,5 +133,15 @@ class MainMenu extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  navigateTo(Widget page) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => page),
+    );
+
+    inController.reset();
+    shadowController.reset();
+    inController.forward();
   }
 }
