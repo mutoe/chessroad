@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:chessroad/board/board-widget.dart';
 import 'package:chessroad/chess/chess-base.dart';
 import 'package:chessroad/common/color-constants.dart';
@@ -6,8 +8,8 @@ import 'package:chessroad/main.dart';
 import 'package:flutter/material.dart';
 
 class BattlePage extends StatefulWidget {
-  static const BoardMarginVertical = 10.0;
-  static const BoardMarginHorizontal = 10.0;
+  static double borderMargin = 10.0;
+  static double screenPaddingHorizontal = 10.0;
 
   @override
   _BattlePageState createState() => _BattlePageState();
@@ -18,6 +20,18 @@ class _BattlePageState extends State<BattlePage> {
   void initState() {
     super.initState();
     Battle.shared.init();
+  }
+
+  void calcScreenPaddingHorizontal() {
+    final windowSize = MediaQuery.of(context).size;
+    double height = windowSize.height;
+    double width = windowSize.width;
+
+    if (height / width < 16.0 / 9.0) {
+      width = height * 9 / 16;
+      BattlePage.screenPaddingHorizontal =
+          max(10, (windowSize.width - width) / 2 - BattlePage.borderMargin);
+    }
   }
 
   Widget createPageHeader() {
@@ -36,7 +50,7 @@ class _BattlePageState extends State<BattlePage> {
                 Icons.arrow_back,
                 color: ColorConstants.DarkTextPrimary,
               ),
-              onPressed: () {},
+              onPressed: () => Navigator.of(context).pop(),
             ),
             Expanded(child: SizedBox()),
             Text(
@@ -68,19 +82,14 @@ class _BattlePageState extends State<BattlePage> {
   }
 
   Widget createBoard() {
-    final windowSize = MediaQuery.of(context).size;
-
     return Container(
       margin: EdgeInsets.symmetric(
-        horizontal: BattlePage.BoardMarginHorizontal,
-        vertical: BattlePage.BoardMarginVertical,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        color: ColorConstants.BoardBackground,
+        horizontal: BattlePage.screenPaddingHorizontal,
+        vertical: BattlePage.borderMargin,
       ),
       child: BoardWidget(
-        width: windowSize.width - BattlePage.BoardMarginHorizontal * 2,
+        width: MediaQuery.of(context).size.width -
+            BattlePage.screenPaddingHorizontal * 2,
         onBoardTap: onBoardTap,
       ),
     );
@@ -95,7 +104,7 @@ class _BattlePageState extends State<BattlePage> {
         color: ColorConstants.BoardBackground,
       ),
       margin:
-          EdgeInsets.symmetric(horizontal: BattlePage.BoardMarginHorizontal),
+          EdgeInsets.symmetric(horizontal: BattlePage.screenPaddingHorizontal),
       padding: EdgeInsets.symmetric(vertical: 2),
       child: Row(children: [
         Expanded(child: SizedBox()),
@@ -116,6 +125,17 @@ class _BattlePageState extends State<BattlePage> {
         Expanded(child: SizedBox()),
       ]),
     );
+  }
+
+  Widget buildFooter() {
+    final size = MediaQuery.of(context).size;
+    final manualText = '<暂无棋谱>';
+
+    if (size.height / size.width > 16 / 9) {
+      return buildManualPanel(manualText);
+    } else {
+      return buildExpandableManualPanel(manualText);
+    }
   }
 
   onBoardTap(BuildContext context, int position) {
@@ -141,9 +161,12 @@ class _BattlePageState extends State<BattlePage> {
 
   @override
   Widget build(BuildContext context) {
+    calcScreenPaddingHorizontal();
+
     final header = createPageHeader();
     final board = createBoard();
     final operatorBar = createOperatorBar();
+    final footer = buildFooter();
 
     return Scaffold(
       backgroundColor: ColorConstants.DarkBackground,
@@ -151,7 +174,51 @@ class _BattlePageState extends State<BattlePage> {
         header,
         board,
         operatorBar,
+        footer,
       ]),
     );
+  }
+
+  Widget buildManualPanel(String text) {
+    final manualStyle = TextStyle(
+      fontSize: 18,
+      color: ColorConstants.DarkTextSecondary,
+      height: 1.5,
+    );
+
+    return Expanded(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 16),
+        child: SingleChildScrollView(
+          child: Text(text, style: manualStyle),
+        ),
+      ),
+    );
+  }
+
+  Widget buildExpandableManualPanel(String text) {
+    final manualStyle = TextStyle(
+      fontSize: 18,
+      height: 1.5,
+    );
+
+    return Expanded(
+        child: IconButton(
+      icon: Icon(Icons.expand_less, color: ColorConstants.DarkTextPrimary),
+      onPressed: () => showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: Text('棋谱', style: TextStyle(color: ColorConstants.Primary)),
+          content: SingleChildScrollView(child: Text(text, style: manualStyle)),
+          actions: [
+            FlatButton(
+              child: Text('好的'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 }
