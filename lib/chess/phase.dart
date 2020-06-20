@@ -3,6 +3,7 @@ import 'package:chessroad/chess/steps-validate.dart';
 import 'chess-base.dart';
 
 class Phase {
+  BattleResult result = BattleResult.Pending;
   String _side;
   List<String> _pieces;
   int halfMove = 0;

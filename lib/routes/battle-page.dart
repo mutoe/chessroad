@@ -47,6 +47,56 @@ class _BattlePageState extends State<BattlePage> {
     );
   }
 
+  void gotWin() {
+    Battle.shared.phase.result = BattleResult.Win;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('赢了', style: TextStyle(color: ColorConstants.Primary)),
+        content: Text('恭喜！'),
+        actions: [
+          FlatButton(child: Text('再来一盘'), onPressed: newGame),
+          FlatButton(
+              child: Text('关闭'), onPressed: () => Navigator.of(context).pop()),
+        ],
+      ),
+    );
+  }
+
+  void gotLose() {
+    Battle.shared.phase.result = BattleResult.Lose;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('输了', style: TextStyle(color: ColorConstants.Primary)),
+        actions: [
+          FlatButton(child: Text('再来一盘'), onPressed: newGame),
+          FlatButton(
+              child: Text('关闭'), onPressed: () => Navigator.of(context).pop()),
+        ],
+      ),
+    );
+  }
+
+  void gotDraw() {
+    Battle.shared.phase.result = BattleResult.Draw;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('和了', style: TextStyle(color: ColorConstants.Primary)),
+        actions: [
+          FlatButton(child: Text('再来一盘'), onPressed: newGame),
+          FlatButton(
+              child: Text('关闭'), onPressed: () => Navigator.of(context).pop()),
+        ],
+      ),
+    );
+  }
+
   engineToGo() async {
     changeStatus('对方思考中...');
     var engineResponse = await CloudEngine().search(Battle.shared.phase);
@@ -60,13 +110,13 @@ class _BattlePageState extends State<BattlePage> {
           changeStatus('清走棋...');
           break;
         case BattleResult.Win:
-          // TODO
+          gotWin();
           break;
         case BattleResult.Lose:
-          // TODO
+          gotLose();
           break;
         case BattleResult.Draw:
-          // TODO
+          gotDraw();
           break;
       }
     } else {
@@ -211,10 +261,13 @@ class _BattlePageState extends State<BattlePage> {
             engineToGo();
             break;
           case BattleResult.Win:
+            gotWin();
             break;
           case BattleResult.Lose:
+            gotLose();
             break;
           case BattleResult.Draw:
+            gotDraw();
             break;
         }
       }

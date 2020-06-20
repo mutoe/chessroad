@@ -1,4 +1,5 @@
 import 'package:chessroad/chess/chess-base.dart';
+import 'package:chessroad/chess/chess-rules.dart';
 import 'package:chessroad/chess/phase.dart';
 
 class Battle {
@@ -34,8 +35,19 @@ class Battle {
   }
 
   BattleResult scanBattleResult() {
+    final forPerson = (_phase.side == Side.Red);
+    if (scanLongCatch()) {
+      return forPerson ? BattleResult.Win : BattleResult.Lose;
+    }
+    if (ChessRules.beKilled(_phase)) {
+      return forPerson ? BattleResult.Lose : BattleResult.Win;
+    }
+    return _phase.halfMove > 120 ? BattleResult.Draw : BattleResult.Pending;
+  }
+
+  bool scanLongCatch() {
     // TODO
-    return BattleResult.Pending;
+    return false;
   }
 
   select(int position) {
