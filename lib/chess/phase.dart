@@ -2,8 +2,9 @@ import 'chess-base.dart';
 
 class Phase {
   String _side;
-
   List<String> _pieces;
+  int halfMove = 0;
+  int fullMove = 0;
 
   String get side => _side;
 
@@ -13,6 +14,16 @@ class Phase {
 
   bool move(int from, int to) {
     if (!validateMove(from, to)) return false;
+
+    if (_pieces[to] != Piece.Empty) {
+      halfMove = 0;
+    } else {
+      halfMove++;
+    }
+
+    if (fullMove == 0 || side == Side.Black) {
+      fullMove++;
+    }
 
     _pieces[to] = _pieces[from];
     _pieces[from] = Piece.Empty;
@@ -24,6 +35,32 @@ class Phase {
 
   bool validateMove(int from, int to) {
     return true;
+  }
+
+  String toFen() {
+    String fen = '';
+    for (var row = 0; row < 10; row++) {
+      var emptyCounter = 0;
+      for (var column = 0; column < 9; column++) {
+        final piece = pieceAt(row * 9 + column);
+        if (piece == Piece.Empty) {
+          emptyCounter++;
+        } else {
+          if (emptyCounter > 0) {
+            fen += emptyCounter.toString();
+            emptyCounter = 0;
+          }
+          fen += piece;
+        }
+      }
+
+      if (emptyCounter > 0) fen += emptyCounter.toString();
+      if (row < 9) fen += '/';
+    }
+    fen += ' $side';
+    fen += ' - - ';
+    fen += '$halfMove $fullMove';
+    return fen;
   }
 
   Phase.defaultPhase() {

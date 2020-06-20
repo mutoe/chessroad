@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:chessroad/board/board-widget.dart';
 import 'package:chessroad/chess/chess-base.dart';
 import 'package:chessroad/common/color-constants.dart';
+import 'package:chessroad/engine/cloud-engine.dart';
 import 'package:chessroad/game/battle.dart';
 import 'package:chessroad/main.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +17,42 @@ class BattlePage extends StatefulWidget {
 }
 
 class _BattlePageState extends State<BattlePage> {
+  String _status = '';
+
   @override
   void initState() {
     super.initState();
     Battle.shared.init();
   }
+
+  engineToGo() async {
+    changeStatus('对方思考中...');
+    var engineResponse = await CloudEngine().search(Battle.shared.phase);
+    if (engineResponse.type == 'move') {
+      final step = engineResponse.value;
+      Battle.shared.move(step.from, step.to);
+      final result = Battle.shared.scanBattleResult();
+
+      switch (result) {
+        case BattleResult.Pending:
+          changeStatus('清走棋...');
+          break;
+        case BattleResult.Win:
+          // TODO
+          break;
+        case BattleResult.Lose:
+          // TODO
+          break;
+        case BattleResult.Draw:
+          // TODO
+          break;
+      }
+    } else {
+      changeStatus('Error: ${engineResponse.type}');
+    }
+  }
+
+  changeStatus(String status) => setState(() => _status = status);
 
   void calcScreenPaddingHorizontal() {
     final windowSize = MediaQuery.of(context).size;
@@ -36,9 +68,9 @@ class _BattlePageState extends State<BattlePage> {
 
   Widget createPageHeader() {
     final titleStyle =
-        TextStyle(fontSize: 28, color: ColorConstants.DarkTextPrimary);
+    TextStyle(fontSize: 28, color: ColorConstants.DarkTextPrimary);
     final subTitleStyle =
-        TextStyle(fontSize: 16, color: ColorConstants.DarkTextSecondary);
+    TextStyle(fontSize: 16, color: ColorConstants.DarkTextSecondary);
 
     return Container(
       margin: EdgeInsets.only(top: ChessRoadApp.StatusBarHeight),
@@ -74,7 +106,7 @@ class _BattlePageState extends State<BattlePage> {
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text('[游戏状态]', maxLines: 1, style: subTitleStyle),
+            child: Text(_status, maxLines: 1, style: subTitleStyle),
           ),
         ],
       ),
@@ -104,7 +136,7 @@ class _BattlePageState extends State<BattlePage> {
         color: ColorConstants.BoardBackground,
       ),
       margin:
-          EdgeInsets.symmetric(horizontal: BattlePage.screenPaddingHorizontal),
+      EdgeInsets.symmetric(horizontal: BattlePage.screenPaddingHorizontal),
       padding: EdgeInsets.symmetric(vertical: 2),
       child: Row(children: [
         Expanded(child: SizedBox()),
@@ -143,7 +175,7 @@ class _BattlePageState extends State<BattlePage> {
     if (phase.side != Side.Red) return;
 
     final tapedPiece = phase.pieceAt(position);
-    if (Battle.shared.focusIndex != -1 &&
+    if (Battle.shared.focusIndex != Move.InvalidIndex &&
         Side.of(phase.pieceAt(Battle.shared.focusIndex)) == Side.Red) {
       if (Battle.shared.focusIndex == position) return;
 
@@ -151,7 +183,18 @@ class _BattlePageState extends State<BattlePage> {
       if (Side.sameSide(focusPiece, tapedPiece)) {
         Battle.shared.select(position);
       } else if (Battle.shared.move(Battle.shared.focusIndex, position)) {
-        // TODO
+        final result = Battle.shared.scanBattleResult();
+        switch (result) {
+          case BattleResult.Pending:
+            engineToGo();
+            break;
+          case BattleResult.Win:
+            break;
+          case BattleResult.Lose:
+            break;
+          case BattleResult.Draw:
+            break;
+        }
       }
     } else {
       if (tapedPiece != Piece.Empty) Battle.shared.select(position);
@@ -204,21 +247,25 @@ class _BattlePageState extends State<BattlePage> {
 
     return Expanded(
         child: IconButton(
-      icon: Icon(Icons.expand_less, color: ColorConstants.DarkTextPrimary),
-      onPressed: () => showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: Text('棋谱', style: TextStyle(color: ColorConstants.Primary)),
-          content: SingleChildScrollView(child: Text(text, style: manualStyle)),
-          actions: [
-            FlatButton(
-              child: Text('好的'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        ),
-      ),
-    ));
+          icon: Icon(Icons.expand_less, color: ColorConstants.DarkTextPrimary),
+          onPressed: () =>
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) =>
+                    AlertDialog(
+                      title: Text('棋谱',
+                          style: TextStyle(color: ColorConstants.Primary)),
+                      content: SingleChildScrollView(
+                          child: Text(text, style: manualStyle)),
+                      actions: [
+                        FlatButton(
+                          child: Text('好的'),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    ),
+              ),
+        ));
   }
 }

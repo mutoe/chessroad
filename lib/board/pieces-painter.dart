@@ -13,8 +13,8 @@ class PiecesPainter extends PainterBase {
   PiecesPainter({
     @required double width,
     @required this.phase,
-    this.focusIndex = -1,
-    this.blurIndex = -1,
+    this.focusIndex = Move.InvalidIndex,
+    this.blurIndex = Move.InvalidIndex,
   }) : super(width: width) {
     pieceSide = squareSide * .9;
   }
@@ -44,8 +44,8 @@ class PiecesPainter extends PainterBase {
     double pieceSide,
     double offsetX,
     double offsetY,
-    int focusIndex = -1,
-    int blurIndex = -1,
+    int focusIndex = Move.InvalidIndex,
+    int blurIndex = Move.InvalidIndex,
   }) {
     final left = offsetX;
     final top = offsetY;
@@ -105,7 +105,7 @@ class PiecesPainter extends PainterBase {
       textPainter.paint(canvas, textOffset);
 
       // focus and blur effect
-      if (focusIndex != -1) {
+      if (focusIndex != Move.InvalidIndex) {
         final int row = focusIndex ~/ 9;
         final int column = focusIndex % 9;
 
@@ -119,7 +119,7 @@ class PiecesPainter extends PainterBase {
           paint,
         );
       }
-      if (blurIndex != -1) {
+      if (blurIndex != Move.InvalidIndex) {
         final int row = blurIndex ~/ 9;
         final int column = blurIndex % 9;
 
