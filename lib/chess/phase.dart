@@ -67,6 +67,10 @@ class Phase {
   }
 
   Phase.defaultPhase() {
+    initDefaultPhase();
+  }
+
+  void initDefaultPhase() {
     _side = Side.Red;
     _pieces = List<String>(90);
 

@@ -24,6 +24,11 @@ class Battle {
     _focusIndex = _blurIndex = Move.InvalidIndex;
   }
 
+  newGame() {
+    Battle.shared.phase.initDefaultPhase();
+    _focusIndex = _blurIndex = Move.InvalidIndex;
+  }
+
   String toString() {
     return 'Battle: {focusIndex: $_focusIndex, blurIndex: $_blurIndex}';
   }

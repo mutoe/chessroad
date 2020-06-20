@@ -25,6 +25,28 @@ class _BattlePageState extends State<BattlePage> {
     Battle.shared.init();
   }
 
+  newGame() {
+    confirm() {
+      Navigator.of(context).pop();
+      Battle.shared.newGame();
+      setState(() {});
+    }
+
+    cancel() => Navigator.of(context).pop();
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('放弃对局？', style: TextStyle(color: ColorConstants.Primary)),
+        content: SingleChildScrollView(child: Text('你确定要放弃当前对局吗？')),
+        actions: [
+          FlatButton(child: Text('确定'), onPressed: confirm),
+          FlatButton(child: Text('取消'), onPressed: cancel),
+        ],
+      ),
+    );
+  }
+
   engineToGo() async {
     changeStatus('对方思考中...');
     var engineResponse = await CloudEngine().search(Battle.shared.phase);
@@ -68,9 +90,9 @@ class _BattlePageState extends State<BattlePage> {
 
   Widget createPageHeader() {
     final titleStyle =
-    TextStyle(fontSize: 28, color: ColorConstants.DarkTextPrimary);
+        TextStyle(fontSize: 28, color: ColorConstants.DarkTextPrimary);
     final subTitleStyle =
-    TextStyle(fontSize: 16, color: ColorConstants.DarkTextSecondary);
+        TextStyle(fontSize: 16, color: ColorConstants.DarkTextSecondary);
 
     return Container(
       margin: EdgeInsets.only(top: ChessRoadApp.StatusBarHeight),
@@ -136,13 +158,13 @@ class _BattlePageState extends State<BattlePage> {
         color: ColorConstants.BoardBackground,
       ),
       margin:
-      EdgeInsets.symmetric(horizontal: BattlePage.screenPaddingHorizontal),
+          EdgeInsets.symmetric(horizontal: BattlePage.screenPaddingHorizontal),
       padding: EdgeInsets.symmetric(vertical: 2),
       child: Row(children: [
         Expanded(child: SizedBox()),
         FlatButton(
           child: Text('新对局', style: buttonStyle),
-          onPressed: () {},
+          onPressed: newGame,
         ),
         Expanded(child: SizedBox()),
         FlatButton(
@@ -247,25 +269,21 @@ class _BattlePageState extends State<BattlePage> {
 
     return Expanded(
         child: IconButton(
-          icon: Icon(Icons.expand_less, color: ColorConstants.DarkTextPrimary),
-          onPressed: () =>
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) =>
-                    AlertDialog(
-                      title: Text('棋谱',
-                          style: TextStyle(color: ColorConstants.Primary)),
-                      content: SingleChildScrollView(
-                          child: Text(text, style: manualStyle)),
-                      actions: [
-                        FlatButton(
-                          child: Text('好的'),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
-              ),
-        ));
+      icon: Icon(Icons.expand_less, color: ColorConstants.DarkTextPrimary),
+      onPressed: () => showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: Text('棋谱', style: TextStyle(color: ColorConstants.Primary)),
+          content: SingleChildScrollView(child: Text(text, style: manualStyle)),
+          actions: [
+            FlatButton(
+              child: Text('好的'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 }
