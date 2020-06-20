@@ -1,7 +1,8 @@
 import 'package:chessroad/board/board-painter.dart';
+import 'package:chessroad/board/pieces-painter.dart';
 import 'package:chessroad/board/words-on-board.dart';
-
-import '../common/color-constants.dart';
+import 'package:chessroad/chess/phase.dart';
+import 'package:chessroad/common/color-constants.dart';
 import 'package:flutter/material.dart';
 
 class BoardWidget extends StatelessWidget {
@@ -24,6 +25,10 @@ class BoardWidget extends StatelessWidget {
       ),
       child: CustomPaint(
         painter: BoardPainter(width: width),
+        foregroundPainter: PiecesPainter(
+          width: width,
+          phase: Phase.defaultPhase(),
+        ),
         child: Container(
           margin: EdgeInsets.symmetric(
             vertical: Padding,

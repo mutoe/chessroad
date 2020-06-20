@@ -20,11 +20,11 @@ class ColorConstants {
   static const FocusPosition = Color(0x99ffffff);
   static const BlurPosition = Color(0x99ffffff);
 
-  static const BlackPieceColor = Color.fromARGB(0xff, 0x00, 0x00, 0x00);
-  static const BlackPieceBoarderColor = Color.fromARGB(0xff, 0x22, 0x22, 0x22);
+  static const BlackPieceColor = Color(0xff000000);
+  static const BlackPieceBorderColor = Color(0xff222222);
 
-  static const RedPieceColor = Color.fromARGB(0xff, 0x7b, 0x00, 0x00);
-  static const RedPieceBorderColor = Color.fromARGB(0xff, 0x66, 0x00, 0x00);
+  static const RedPieceColor = Color(0xff7b0000);
+  static const RedPieceBorderColor = Color(0xff660000);
 
-  static const PieceTextColor = Color.fromARGB(0xcc, 0xff, 0xff, 0xff);
+  static const PieceTextColor = Color(0xccffffff);
 }

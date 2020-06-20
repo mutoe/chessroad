@@ -1,18 +1,12 @@
 import 'dart:math';
 
 import 'package:chessroad/board/board-widget.dart';
+import 'package:chessroad/board/painter-base.dart';
 import 'package:chessroad/common/color-constants.dart';
 import 'package:flutter/material.dart';
 
-class BoardPainter extends CustomPainter {
-  final double width;
-  final double gridWidth;
-  final double squareSide;
-  final thePaint = Paint();
-
-  BoardPainter({@required this.width})
-      : gridWidth = (width - BoardWidget.Padding * 2) * 8 / 9,
-        squareSide = (width - BoardWidget.Padding * 2) / 9;
+class BoardPainter extends PainterBase {
+  BoardPainter({@required double width}) : super(width: width);
 
   static doPaint(
     Canvas canvas,
@@ -90,14 +84,14 @@ class BoardPainter extends CustomPainter {
       paint,
     );
 
-    // cannon / batman position
+    // cannon / pawn position
     final List<Offset> positions = [
       // cannon position
       Offset(left + squareSide * 1, top + squareSide * 2),
       Offset(left + squareSide * 7, top + squareSide * 2),
       Offset(left + squareSide * 1, top + squareSide * 7),
       Offset(left + squareSide * 7, top + squareSide * 7),
-      // batman position
+      // pawn position
       Offset(left + squareSide * 2, top + squareSide * 3),
       Offset(left + squareSide * 4, top + squareSide * 3),
       Offset(left + squareSide * 6, top + squareSide * 3),

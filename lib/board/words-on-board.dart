@@ -35,7 +35,10 @@ class WordsOnBoard extends StatelessWidget {
     );
 
     return DefaultTextStyle(
-      style: TextStyle(color: ColorConstants.BoardTips),
+      style: TextStyle(
+        color: ColorConstants.BoardTips,
+        fontFamily: 'QiTi',
+      ),
       child: Column(
         children: [
           Row(children: blackChildren),
