@@ -89,6 +89,11 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
       child: Column(
         children: [
           Expanded(child: SizedBox(), flex: 4),
+          Hero(
+            tag: 'logo',
+            child: Image.asset('assets/images/logo.png'),
+          ),
+          Expanded(child: SizedBox()),
           Transform.scale(
             scale: inAnimation.value,
             child: Text('中国象棋', style: nameStyle, textAlign: TextAlign.center),
@@ -121,6 +126,16 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
       backgroundColor: ColorConstants.LightBackground,
       body: Stack(
         children: [
+          Positioned(
+            right: 0,
+            top: 0,
+            child: Image(image: AssetImage('assets/images/mei.png')),
+          ),
+          Positioned(
+            left: 0,
+            bottom: 0,
+            child: Image(image: AssetImage('assets/images/zhu.png')),
+          ),
           menuItems,
           Positioned(
             top: ChessRoadApp.StatusBarHeight,

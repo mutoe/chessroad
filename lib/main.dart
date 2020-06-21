@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:chessroad/routes/battle-page.dart';
 import 'package:chessroad/routes/main-menu.dart';
+import 'package:chessroad/services/audios.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -23,8 +23,19 @@ void main() {
   SystemChrome.setEnabledSystemUIOverlays([]);
 }
 
-class ChessRoadApp extends StatelessWidget {
+class ChessRoadApp extends StatefulWidget {
   static const StatusBarHeight = 28.0;
+
+  @override
+  _ChessRoadAppState createState() => _ChessRoadAppState();
+}
+
+class _ChessRoadAppState extends State<ChessRoadApp> {
+  @override
+  void initState() {
+    super.initState();
+    Audios.loopBgm('bg_music.mp3');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +45,13 @@ class ChessRoadApp extends StatelessWidget {
         fontFamily: 'QiTi',
       ),
       debugShowCheckedModeBanner: false,
-      home: MainMenu(),
+      home: WillPopScope(
+        onWillPop: () async {
+          Audios.release();
+          return true;
+        },
+        child: MainMenu(),
+      ),
     );
   }
 }

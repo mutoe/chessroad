@@ -15,10 +15,11 @@ class Phase {
 
   String pieceAt(int index) => _pieces[index];
 
-  bool move(int from, int to) {
-    if (!validateMove(from, to)) return false;
+  String move(int from, int to) {
+    if (!validateMove(from, to)) return null;
+    final captured = _pieces[to];
 
-    if (_pieces[to] != Piece.Empty) {
+    if (captured != Piece.Empty) {
       halfMove = 0;
     } else {
       halfMove++;
@@ -33,7 +34,7 @@ class Phase {
 
     _side = Side.exchange(_side);
 
-    return true;
+    return captured;
   }
 
   bool validateMove(int from, int to) {

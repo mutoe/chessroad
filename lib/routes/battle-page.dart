@@ -6,6 +6,7 @@ import 'package:chessroad/common/color-constants.dart';
 import 'package:chessroad/engine/cloud-engine.dart';
 import 'package:chessroad/game/battle.dart';
 import 'package:chessroad/main.dart';
+import 'package:chessroad/services/audios.dart';
 import 'package:flutter/material.dart';
 
 class BattlePage extends StatefulWidget {
@@ -48,6 +49,7 @@ class _BattlePageState extends State<BattlePage> {
   }
 
   void gotWin() {
+    Audios.playTone('win.mp3');
     Battle.shared.phase.result = BattleResult.Win;
     showDialog(
       context: context,
@@ -59,25 +61,27 @@ class _BattlePageState extends State<BattlePage> {
           FlatButton(child: Text('再来一盘'), onPressed: newGame),
           FlatButton(
               child: Text('关闭'), onPressed: () => Navigator.of(context).pop()),
-        ],
-      ),
+            ],
+          ),
     );
   }
 
   void gotLose() {
+    Audios.playTone('lose.mp3');
     Battle.shared.phase.result = BattleResult.Lose;
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text('输了', style: TextStyle(color: ColorConstants.Primary)),
-        actions: [
-          FlatButton(child: Text('再来一盘'), onPressed: newGame),
-          FlatButton(
-              child: Text('关闭'), onPressed: () => Navigator.of(context).pop()),
-        ],
-      ),
+      builder: (context) =>
+          AlertDialog(
+            title: Text('输了', style: TextStyle(color: ColorConstants.Primary)),
+            actions: [
+              FlatButton(child: Text('再来一盘'), onPressed: newGame),
+              FlatButton(
+                  child: Text('关闭'), onPressed: () => Navigator.of(context).pop()),
+            ],
+          ),
     );
   }
 
@@ -157,6 +161,11 @@ class _BattlePageState extends State<BattlePage> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             Expanded(child: SizedBox()),
+            Hero(
+              tag: 'logo',
+              child: Image.asset('assets/images/logo-mini.png'),
+            ),
+            SizedBox(width: 10),
             Text(
               '单机对战',
               style: titleStyle,

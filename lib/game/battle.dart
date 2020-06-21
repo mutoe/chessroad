@@ -1,6 +1,7 @@
 import 'package:chessroad/chess/chess-base.dart';
 import 'package:chessroad/chess/chess-rules.dart';
 import 'package:chessroad/chess/phase.dart';
+import 'package:chessroad/services/audios.dart';
 
 class Battle {
   static Battle _instance;
@@ -53,13 +54,24 @@ class Battle {
   select(int position) {
     _focusIndex = position;
     _blurIndex = Move.InvalidIndex;
+    Audios.playTone('click.mp3');
   }
 
   move(int from, int to) {
-    if (!_phase.move(from, to)) return false;
+    final captured = _phase.move(from, to);
+    if (captured == null) {
+      Audios.playTone('invalid.mp3');
+      return false;
+    }
 
     _blurIndex = from;
     _focusIndex = to;
+
+    if (ChessRules.checked(_phase)) {
+      Audios.playTone('check.mp3');
+    } else {
+      Audios.playTone(captured != Piece.Empty ? 'capture.mp3' : 'move.mp3');
+    }
 
     return true;
   }
