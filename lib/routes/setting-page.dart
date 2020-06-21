@@ -5,6 +5,7 @@ import 'package:chessroad/services/audios.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingPage extends StatefulWidget {
   @override
@@ -127,17 +128,27 @@ class _SettingPageState extends State<SettingPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(height: 5),
+            Text(
+              '特别感谢贺照云老师提供的教程与素材！',
+              style: TextStyle(fontFamily: ''),
+            ),
+            SizedBox(height: 15),
             Text('版本', style: TextStyle(fontFamily: '')),
             Text('$_version', style: TextStyle(fontFamily: '')),
             SizedBox(height: 15),
-            Text('官网', style: TextStyle(fontFamily: '')),
+            Text('个人博客', style: TextStyle(fontFamily: '')),
             GestureDetector(
-              onTap: () {
-                Clipboard.setData(ClipboardData(text: 'https://mutoe.com'));
-                Toast.toast(context, message: '网址已复制！');
+              onTap: () async {
+                var url = 'https://blog.mutoe.com';
+                if (await canLaunch(url)) {
+                  await launch(url);
+                } else {
+                  Clipboard.setData(ClipboardData(text: url));
+                  Toast.toast(context, message: '网址已复制！');
+                }
               },
               child: Text(
-                "https://mutoe.com",
+                "https://blog.mutoe.com",
                 style: TextStyle(fontFamily: '', color: Colors.blue),
               ),
             ),
