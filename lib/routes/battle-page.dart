@@ -9,6 +9,7 @@ import 'package:chessroad/engine/analysis.dart';
 import 'package:chessroad/engine/cloud-engine.dart';
 import 'package:chessroad/game/battle.dart';
 import 'package:chessroad/main.dart';
+import 'package:chessroad/routes/setting-page.dart';
 import 'package:chessroad/services/audios.dart';
 import 'package:flutter/material.dart';
 
@@ -176,7 +177,9 @@ class _BattlePageState extends State<BattlePage> {
             Expanded(child: SizedBox()),
             IconButton(
               icon: Icon(Icons.settings, color: ColorConstants.DarkTextPrimary),
-              onPressed: () {},
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => SettingPage()),
+              ),
             ),
           ]),
           Container(

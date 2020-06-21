@@ -1,6 +1,7 @@
 import 'package:chessroad/common/color-constants.dart';
 import 'package:chessroad/main.dart';
 import 'package:chessroad/routes/battle-page.dart';
+import 'package:chessroad/routes/setting-page.dart';
 import 'package:flutter/material.dart';
 
 class MainMenu extends StatefulWidget {
@@ -142,7 +143,9 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
             left: 10,
             child: IconButton(
               icon: Icon(Icons.settings, color: ColorConstants.Primary),
-              onPressed: () {},
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => SettingPage()),
+              ),
             ),
           ),
         ],
