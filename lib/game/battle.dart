@@ -79,4 +79,34 @@ class Battle {
   clear() {
     _blurIndex = _focusIndex = Move.InvalidIndex;
   }
+
+  bool regret({steps = 2}) {
+    if (_phase.side != Side.Red) {
+      Audios.playTone('invalid.mp3');
+      return false;
+    }
+
+    var regreted = false;
+    for (var i = 0; i < steps; i++) {
+      if (!_phase.regret()) break;
+
+      final lastMove = _phase.lastMove;
+      if (lastMove != null) {
+        _blurIndex = lastMove.from;
+        _focusIndex = lastMove.to;
+      } else {
+        _blurIndex = _focusIndex = Move.InvalidIndex;
+      }
+
+      regreted = true;
+    }
+
+    if (regreted) {
+      Audios.playTone('regret.mp3');
+      return true;
+    }
+
+    Audios.playTone('invalid.mp3');
+    return false;
+  }
 }

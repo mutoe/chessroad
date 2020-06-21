@@ -1,3 +1,4 @@
+import 'package:chessroad/chess/chess-recorder.dart';
 import 'package:chessroad/chess/steps-validate.dart';
 
 import 'chess-base.dart';
@@ -6,8 +7,15 @@ class Phase {
   BattleResult result = BattleResult.Pending;
   String _side;
   List<String> _pieces;
-  int halfMove = 0;
-  int fullMove = 0;
+  ChessRecorder _recorder;
+
+  get halfMove => _recorder.halfMove;
+
+  get fullMove => _recorder.fullMove;
+
+  Move get lastMove => _recorder.last;
+
+  get lastCapturedPhase => _recorder.lastCapturedPhase;
 
   String get side => _side;
 
@@ -19,18 +27,10 @@ class Phase {
     if (!validateMove(from, to)) return null;
     final captured = _pieces[to];
 
-    if (captured != Piece.Empty) {
-      halfMove = 0;
-    } else {
-      halfMove++;
-    }
-
-    if (fullMove == 0 || side == Side.Black) {
-      fullMove++;
-    }
-
     _pieces[to] = _pieces[from];
     _pieces[from] = Piece.Empty;
+
+    _recorder.stepIn(Move(from, to, captured: captured), this);
 
     _side = Side.exchange(_side);
 
@@ -64,7 +64,7 @@ class Phase {
     }
     fen += ' $side';
     fen += ' - - ';
-    fen += '$halfMove $fullMove';
+    fen += '${_recorder?.halfMove ?? 0} ${_recorder?.fullMove ?? 0}';
     return fen;
   }
 
@@ -117,19 +117,67 @@ class Phase {
     for (var i = 0; i < 90; i++) {
       _pieces[i] ??= Piece.Empty;
     }
+
+    _recorder = ChessRecorder(lastCapturedPhase: toFen());
   }
 
   Phase.clone(Phase other) {
     _pieces = List<String>();
     other._pieces.forEach((piece) => _pieces.add(piece));
     _side = other._side;
-    halfMove = other.halfMove;
-    fullMove = other.fullMove;
+    _recorder = other._recorder;
   }
 
   void moveTest(Move move, {turnSide = false}) {
     _pieces[move.to] = _pieces[move.from];
     _pieces[move.from] = Piece.Empty;
     if (turnSide) _side = Side.exchange(_side);
+  }
+
+  String movesSinceLastCaptured() {
+    var steps = '';
+    var positionAfterLastCaptured = 0;
+
+    for (var i = _recorder.stepsCounter - 1; i >= 0; i--) {
+      if (_recorder.stepAt(i).captured != Piece.Empty) break;
+      positionAfterLastCaptured = i;
+    }
+
+    for (var i = positionAfterLastCaptured; i < _recorder.stepsCounter; i++) {
+      steps += ' ${_recorder.stepAt(i).step}';
+    }
+
+    return steps.length > 0 ? steps.substring(1) : '';
+  }
+
+  bool regret() {
+    final lastMove = _recorder.removeLast();
+    if (lastMove == null) return false;
+
+    _pieces[lastMove.from] = _pieces[lastMove.to];
+    _pieces[lastMove.to] = lastMove.captured;
+
+    _side = Side.exchange(_side);
+
+    final counterMarks = ChessRecorder.fromCounterMarks(lastMove.counterMarks);
+    _recorder.halfMove = counterMarks.halfMove;
+    _recorder.fullMove = counterMarks.fullMove;
+
+    if (lastMove.captured != Piece.Empty) {
+      final tempPhase = Phase.clone(this);
+      final moves = _recorder.reverseMovesToPreviousCapture();
+      moves.forEach((move) {
+        tempPhase._pieces[move.from] = tempPhase._pieces[move.to];
+        tempPhase._pieces[move.to] = move.captured;
+
+        tempPhase._side = Side.exchange(_side);
+      });
+
+      _recorder.lastCapturedPhase = tempPhase.toFen();
+    }
+
+    result = BattleResult.Pending;
+
+    return true;
   }
 }

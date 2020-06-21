@@ -76,11 +76,13 @@ class Move {
   int fx, fy, tx, ty;
   String captured;
   String step;
+  String counterMarks;
 
   Move(
     this.from,
     this.to, {
     this.captured = Piece.Empty,
+    this.counterMarks = '0 0',
   }) {
     fx = from % 9;
     fy = from ~/ 9;

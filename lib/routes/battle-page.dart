@@ -61,8 +61,8 @@ class _BattlePageState extends State<BattlePage> {
           FlatButton(child: Text('再来一盘'), onPressed: newGame),
           FlatButton(
               child: Text('关闭'), onPressed: () => Navigator.of(context).pop()),
-            ],
-          ),
+        ],
+      ),
     );
   }
 
@@ -79,7 +79,8 @@ class _BattlePageState extends State<BattlePage> {
             actions: [
               FlatButton(child: Text('再来一盘'), onPressed: newGame),
               FlatButton(
-                  child: Text('关闭'), onPressed: () => Navigator.of(context).pop()),
+                  child: Text('关闭'),
+                  onPressed: () => Navigator.of(context).pop()),
             ],
           ),
     );
@@ -228,7 +229,10 @@ class _BattlePageState extends State<BattlePage> {
         Expanded(child: SizedBox()),
         FlatButton(
           child: Text('悔棋', style: buttonStyle),
-          onPressed: () {},
+          onPressed: () {
+            Battle.shared.regret(steps: 2);
+            setState(() {});
+          },
         ),
         Expanded(child: SizedBox()),
         FlatButton(
