@@ -1,16 +1,20 @@
-# chessroad
+# Chess Road
 
-A new Flutter application.
+A Chinese Chess game for study Flutter development.
 
-## Getting Started
+> *Developed by Android Studio & IdeaVim*
 
-This project is a starting point for a Flutter application.
+> Thanks for Zhaoyun He provide tutorial and resources !
+> Original repository: [https://github.com/hezhaoyun/chessroad]()
 
-A few resources to get you started if this is your first Flutter project:
+**Note: Local battle engine and ranking has not been implemented yet.**
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Preview
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![](docs/home.png)
+
+![](docs/battle-page.png)
+
+![](docs/analysis-page.png)
+
+![](docs/settings.png)
