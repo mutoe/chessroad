@@ -1,5 +1,6 @@
 import 'package:chessroad/chess/chess-base.dart';
 import 'package:chessroad/chess/phase.dart';
+import 'package:chessroad/engine/analysis.dart';
 import 'package:chessroad/engine/chess-db.dart';
 
 class EngineResponse {
@@ -7,6 +8,11 @@ class EngineResponse {
   final dynamic value;
 
   EngineResponse(this.type, {this.value});
+
+  @override
+  String toString() {
+    return 'type: $type, value: $value';
+  }
 }
 
 class CloudEngine {
@@ -47,6 +53,24 @@ class CloudEngine {
         );
       }
     }
+    return EngineResponse('unknown-error');
+  }
+
+  static Future<EngineResponse> analysis(Phase phase) async {
+    final fen = phase.toFen();
+    var response = await ChessDB.query(fen);
+
+    if (response == null) {
+      return EngineResponse('network-error');
+    }
+
+    if (response.startsWith('move:')) {
+      final items = AnalysisFetcher.fetch(response);
+      if (items.isEmpty) return EngineResponse('no-result');
+      return EngineResponse('analysis', value: items);
+    }
+
+    print('ChessDB.query: $response');
     return EngineResponse('unknown-error');
   }
 }

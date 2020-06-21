@@ -2,7 +2,10 @@ import 'dart:math';
 
 import 'package:chessroad/board/board-widget.dart';
 import 'package:chessroad/chess/chess-base.dart';
+import 'package:chessroad/chess/step-name.dart';
 import 'package:chessroad/common/color-constants.dart';
+import 'package:chessroad/common/toast.dart';
+import 'package:chessroad/engine/analysis.dart';
 import 'package:chessroad/engine/cloud-engine.dart';
 import 'package:chessroad/game/battle.dart';
 import 'package:chessroad/main.dart';
@@ -19,6 +22,7 @@ class BattlePage extends StatefulWidget {
 
 class _BattlePageState extends State<BattlePage> {
   String _status = '';
+  bool _analyzing = false;
 
   @override
   void initState() {
@@ -73,16 +77,14 @@ class _BattlePageState extends State<BattlePage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) =>
-          AlertDialog(
-            title: Text('输了', style: TextStyle(color: ColorConstants.Primary)),
-            actions: [
-              FlatButton(child: Text('再来一盘'), onPressed: newGame),
-              FlatButton(
-                  child: Text('关闭'),
-                  onPressed: () => Navigator.of(context).pop()),
-            ],
-          ),
+      builder: (context) => AlertDialog(
+        title: Text('输了', style: TextStyle(color: ColorConstants.Primary)),
+        actions: [
+          FlatButton(child: Text('再来一盘'), onPressed: newGame),
+          FlatButton(
+              child: Text('关闭'), onPressed: () => Navigator.of(context).pop()),
+        ],
+      ),
     );
   }
 
@@ -237,7 +239,7 @@ class _BattlePageState extends State<BattlePage> {
         Expanded(child: SizedBox()),
         FlatButton(
           child: Text('分析局面', style: buttonStyle),
-          onPressed: () {},
+          onPressed: _analyzing ? null : analysisPhase,
         ),
         Expanded(child: SizedBox()),
       ]),
@@ -245,8 +247,10 @@ class _BattlePageState extends State<BattlePage> {
   }
 
   Widget buildFooter() {
-    final size = MediaQuery.of(context).size;
-    final manualText = '<暂无棋谱>';
+    final size = MediaQuery
+        .of(context)
+        .size;
+    final manualText = Battle.shared.phase.manualText;
 
     if (size.height / size.width > 16 / 9) {
       return buildManualPanel(manualText);
@@ -350,6 +354,74 @@ class _BattlePageState extends State<BattlePage> {
           ],
         ),
       ),
-    ));
+        ));
+  }
+
+  analysisPhase() async {
+    Toast.toast(context, message: '正在分析局面...', position: ToastPosition.bottom);
+    setState(() {
+      _analyzing = true;
+    });
+    try {
+      final result = await CloudEngine.analysis(Battle.shared.phase);
+      print(result);
+      if (result.type == 'analysis') {
+        List<AnalysisItem> items = result.value;
+        items.forEach((item) =>
+        item.stepName = StepName.translate(
+          Battle.shared.phase,
+          Move.fromEngineStep(item.move),
+        ));
+        showAnalysisItems(
+          context,
+          title: '推荐招法',
+          items: result.value,
+          callback: (index) => Navigator.of(context).pop(),
+        );
+      } else if (result.type == 'no-result') {
+        Toast.toast(
+          context,
+          message: '已请求服务器计算，请稍后查看',
+          position: ToastPosition.bottom,
+        );
+      } else {
+        Toast.toast(context,
+            message: '错误：${result.type}', position: ToastPosition.bottom);
+      }
+    } catch (error) {
+      print('Error: $error');
+      Toast.toast(context,
+          message: '错误：$error', position: ToastPosition.bottom);
+    } finally {
+      setState(() {
+        _analyzing = false;
+      });
+    }
+  }
+
+  void showAnalysisItems(BuildContext context,
+      {String title,
+        List<AnalysisItem> items,
+        Function(AnalysisItem item) callback}) {
+    final List<Widget> children = [];
+    for (var item in items) {
+      children.add(ListTile(
+        title: Text(item.stepName, style: TextStyle(fontSize: 18)),
+        subtitle: Text('胜率: ${item.winrate}%'),
+        trailing: Text('分数: ${item.score}'),
+        onTap: () => callback(item),
+      ));
+      children.add(Divider());
+    }
+    children.insert(0, SizedBox(height: 10));
+    children.add(SizedBox(height: 56));
+
+    showModalBottomSheet(
+      context: context,
+      builder: (_) =>
+          SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: children),
+          ),
+    );
   }
 }

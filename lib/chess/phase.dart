@@ -1,4 +1,5 @@
 import 'package:chessroad/chess/chess-recorder.dart';
+import 'package:chessroad/chess/step-name.dart';
 import 'package:chessroad/chess/steps-validate.dart';
 
 import 'chess-base.dart';
@@ -12,6 +13,8 @@ class Phase {
   get halfMove => _recorder.halfMove;
 
   get fullMove => _recorder.fullMove;
+
+  get manualText => _recorder.buildManualText();
 
   Move get lastMove => _recorder.last;
 
@@ -27,10 +30,12 @@ class Phase {
     if (!validateMove(from, to)) return null;
     final captured = _pieces[to];
 
+    final move = Move(from, to, captured: captured);
+    StepName.translate(this, move);
+    _recorder.stepIn(move, this);
+
     _pieces[to] = _pieces[from];
     _pieces[from] = Piece.Empty;
-
-    _recorder.stepIn(Move(from, to, captured: captured), this);
 
     _side = Side.exchange(_side);
 

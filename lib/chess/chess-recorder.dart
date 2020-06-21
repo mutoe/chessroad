@@ -70,4 +70,18 @@ class ChessRecorder {
 
     return moves;
   }
+
+  String buildManualText({columns = 2}) {
+    var manualText = '';
+    for (var i = 0; i < _history.length; i++) {
+      manualText += '${i < 9 ? ' ' : ''}${i + 1}. ${_history[i].stepName} ';
+      if ((i + 1) % columns == 0) manualText += '\n';
+    }
+
+    if (manualText.isEmpty) {
+      manualText = '<暂无招法>';
+    }
+
+    return manualText;
+  }
 }

@@ -76,6 +76,7 @@ class Move {
   int fx, fy, tx, ty;
   String captured;
   String step;
+  String stepName;
   String counterMarks;
 
   Move(
